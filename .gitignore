@@ -1,1 +1,7 @@
+# npm & yarn stuff
 node_modules
+
+# configs
+.env.local
+.env
+.envrc
