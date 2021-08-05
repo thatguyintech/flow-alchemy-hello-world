@@ -1,4 +1,4 @@
-# Hello World with the Flow Javascript SDK and Alchemy Dashboard 
+# Hello World with the Flow Javascript SDK and Alchemy
 
 This is a simple project to show you how to configure your Flow JS SDK project
 to have metrics and api calls tracked on the Alchemy dashboard.
@@ -12,6 +12,9 @@ on all your dapps.
 
 By the end of this guide you'll have a simple React app that is configured
 to send events to an Alchemy dashboard, that looks like this:
+
+[React App](public/flow-webapp)
+[Alchemy Dashboard](alchemy-dashboard)
 
 ## 🪚 Pre-requesites 
 
