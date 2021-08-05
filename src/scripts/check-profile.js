@@ -13,9 +13,9 @@ export const checkProfile = async() => {
         }
       `,
       fcl.args([
-        fcl.arg("0xba1132bc08f82fe2", t.Address), // <-- t.Address this time :)
+        fcl.arg("0xba1132bc08f82fe2", t.Address), 
       ]),
     ])
     .then(fcl.decode)
-    .then(d => console.log("hello", d.info));
+    .then(d => console.log("Info recorded for address 0xba1132bc08f82fe2", d.info));
 }

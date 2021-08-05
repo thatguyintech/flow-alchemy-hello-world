@@ -1,70 +1,192 @@
-# Getting Started with Create React App
+# Hello World with the Flow Javascript SDK and Alchemy Dashboard 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a simple project to show you how to configure your Flow JS SDK project
+to have metrics and api calls tracked on the Alchemy dashboard.
 
-## Available Scripts
+[Flow](https://www.onflow.org/) is a new blockchain built for the next generation
+of apps, games, and digital assets.
 
-In the project directory, you can run:
+[Alchemy](https://www.alchemy.com/) is a developer platform that makes blockchain
+development easier, with tools for deploying, building, monitoring, and alerting
+on all your dapps.
 
-### `yarn start`
+By the end of this guide you'll have a simple React app that is configured
+to send events to an Alchemy dashboard, that looks like this:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 🪚 Pre-requesites 
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+This guide assumes that you have:
+- [An Alchemy Flow account](https://www.alchemy.com/), and
+- [Access to the Alchemy Flow Dashboard](https://flow-dashboard.alchemyapi.io/)
 
-### `yarn test`
+## 🧠 Overview
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. 🔑 Create an Alchemy Flow App
+2. 🎸 Start a React app and configure the Flow Javascript SDK
+3. ✍ Make requests
 
-### `yarn build`
+## 🔑 Create an Alchemy Flow App
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+To use Alchemy's products and connect to the Flow chain, you need an API key to authenticate your requests.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+You can create API keys directly from the Alchemy Flow dashboard. To make a new key, click on the "Create App" button circled below:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Fill in the details under "Create App" to get your new key. There are two options for networks: Mainnet and Testnet (the API methods for both are the same), but they each have different gRPC endpoints:
+Mainnet: https://flow-mainnet.g.alchemy.com
+Testnet: https://flow-testnet.g.alchemy.com
 
-### `yarn eject`
+At anytime, you can visit your dashboard homepage and view your app's keys by clicking the key icon on the far right. To make requests to flow via gRPC, you'll need both the gRPC endpoint and your unique api_key. 
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+By clicking the ‘View Details’ button, you can also see additional information, including your keys and recent requests.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🎸 Start a React app and configure the Flow Javascript SDK
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+1. Create a new project and Install the Flow SDK
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Run the following commands on your command line to initialize a new FCL project. 
 
-## Learn More
+```bash
+yarn create react-app flow-alchemy-hello-world
+cd flow-alchemy-hello-world
+yarn add @onflow/fcl @onflow/types
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+In this example, we used yarn to install @onflow/fclbut you can also use NPM.
+- @onflow/fcl is the latest build of FCL, the [Flow Client Library](https://docs.onflow.org/fcl/).
+- @onflow/types is a conversion layer between JavaScript and Cadence (Flow's native language). These are used when we want to pass JavaScript into Cadence transactions and scripts.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. Configure your app + Alchemy access node
 
-### Code Splitting
+Generally it's a good idea to use environment variables for your configuration. This will allow us to change environments easily and Create React App comes with fairly good support for them out of the box. We will then need to pass these environment variables to FCL before it talks to anything else. To achieve this we will create two files (`./.env.local`, `./src/config.js`) one to hold our env. variables locally, one to import those env. variables and supply them to FCL. Then we will import our FCL configuration as the very first thing in our application.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+From your command line, create these two files:
 
-### Analyzing the Bundle Size
+```bash
+touch .env.local        # Create a .env.local file to store our environment variables
+touch ./src/config.js   # Create a ./src/config.js file where we will import our environment variables and configure FCL
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Now that we have our files we should add in our environment variables and configure your Alchemy access node. 
+- `REACT_APP_ACCESS_NODE` is your gRPC Endpoint in your Alchemy dashboard
 
-### Making a Progressive Web App
+Open `.env.local` and add the following to it:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```
+# File: .env.local
 
-### Advanced Configuration
+# REACT_APP_ACCESS_NODE will be the Alchemy endpoint for our application
+# REACT_APP_ALCHEMY_API_KEY is your unique Alchemy API key.
+REACT_APP_ACCESS_NODE= https://flow-testnet.g.alchemy.com
+REACT_APP_ALCHEMY_API_KEY= "your-api-key"
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# WALLET_DISCOVERY will be the endpoint our application
+# will use to discover available FCL compatible wallets.
+REACT_APP_WALLET_DISCOVERY= https://fcl-discovery.onflow.org/testnet/authn
 
-### Deployment
+# CONTRACT_PROFILE will be the address that has the Profile
+# smart contract we will be using in this guide.
+REACT_APP_CONTRACT_PROFILE= 0xba1132bc08f82fe2
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+These environment variables should now be available for us to use when we configure FCL, which we will do next. 
 
-### `yarn build` fails to minify
+Open ./src/config.js and add the following to it:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```javascript
+// File: ./src/config.js
+import * as fcl from "@onflow/fcl"
+
+fcl.config()
+  .put("grpc.metadata", {"api_key": process.env.REACT_APP_ALCHEMY_API_KEY})
+  .put("accessNode.api", process.env.REACT_APP_ACCESS_NODE) // Configure FCL's Alchemy Access Node
+  .put("challenge.handshake", process.env.REACT_APP_WALLET_DISCOVERY) // Configure FCL's Wallet Discovery mechanism
+  .put("0xProfile", process.env.REACT_APP_CONTRACT_PROFILE) // Will let us use `0xProfile` in our Cadence
+```
+
+Import the `config.js` file in your `index.js`:
+
+We now have a file that configures FCL but... it is not yet being invoked, so FCL still remains un-configured in our application. The final step of this section is to import this file as the first thing in our application. Open `./src/index.js` and add the following as the first line:
+
+```javascript
+// File: ./src/index.js
+
+import "./config" // Imports environment variables and configures FCL
+// Then the rest of ./src/index.js
+import React from "react"
+import ReactDOM from "react-dom"
+```
+
+Congrats!! You have configured FCL, which is the very first step in having a decentralized application built on Flow 🎉.
+
+And now, for the final step to tie it all together...
+
+## ✍ Make requests
+
+Now that we have FCL configured and ready to go, let's use one of the SDK functions to run a script against the Flow testnet
+and see that action tracked successfully on the Alchemy dashboard.
+
+Create a new foder to hold your Flow scripts and write your first script:
+
+```bash
+mkdir ./src/scripts
+touch ./src/scripts/check-profile.js
+```
+
+Inside `./src/scripts/check-profile.js`, copy this code:
+
+```javascript
+// ./src/scripts/check-profile.js
+import * as fcl from "@onflow/fcl"
+import * as t from "@onflow/types"
+
+export const checkProfile = async() => {
+  console.log("checking")
+  await fcl
+    .send([
+      fcl.script`
+        import Profile from 0xba1132bc08f82fe2
+
+        pub fun main(address: Address): Profile.ReadOnly? {
+          return Profile.read(address)
+        }
+      `,
+      fcl.args([
+        fcl.arg("0xba1132bc08f82fe2", t.Address), 
+      ]),
+    ])
+    .then(fcl.decode)
+    .then(d => console.log("Info recorded for address 0xba1132bc08f82fe2", d.info));
+}
+```
+
+This function `checkProfile` uses the `fcl.send` function to execute a script to read the information
+stored at a specific address: `0xba1132bc08f82fe2`, and then prints the `info` field recorded on the blockchain.
+We'll call this function from our app homepage by hooking it up to a button.
+
+In `./src/App.js`, we'll simplify the app to show just a button that runs the `checkProfile` function.
+
+```javascript
+// ./src/App.js
+import React from "react"
+import {checkProfile} from "./scripts/check-profile"
+
+export default function App() {
+  return (
+    <div>
+      <button onClick={checkProfile}>Get Info for address 0xba1132bc08f82fe2</button>
+    </div>
+  )
+}
+```
+
+Save these files.
+
+Now, load up the app in local development via:
+
+```bash
+npm start
+```
+
+After you click the button, you should be able to refresh your Alchemy dashboard and see requests being logged!
+
+Congrats 🎉 you've successfully tracked your first Flow blockchain event on the Alchemy dashboard :)
