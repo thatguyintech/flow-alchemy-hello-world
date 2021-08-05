@@ -13,8 +13,7 @@ on all your dapps.
 By the end of this guide you'll have a simple React app that is configured
 to send events to an Alchemy dashboard, that looks like this:
 
-![React App](public/flow-webapp)
-![Alchemy Dashboard](public/alchemy-dashboard.png)
+![React App](public/flow-webapp.png) ![Alchemy Dashboard](public/alchemy-dashboard.png)
 
 ## 🪚 Pre-requesites 
 
@@ -34,13 +33,22 @@ To use Alchemy's products and connect to the Flow chain, you need an API key to 
 
 You can create API keys directly from the Alchemy Flow dashboard. To make a new key, click on the "Create App" button circled below:
 
+![Create app](public/create-app.png)
+
 Fill in the details under "Create App" to get your new key. There are two options for networks: Mainnet and Testnet (the API methods for both are the same), but they each have different gRPC endpoints:
-Mainnet: https://flow-mainnet.g.alchemy.com
-Testnet: https://flow-testnet.g.alchemy.com
+
+- Mainnet: https://flow-mainnet.g.alchemy.com
+- Testnet: https://flow-testnet.g.alchemy.com
+
+![Create app details](public/create-app-details.png)
 
 At anytime, you can visit your dashboard homepage and view your app's keys by clicking the key icon on the far right. To make requests to flow via gRPC, you'll need both the gRPC endpoint and your unique api_key. 
 
+![View Keys](public/view-keys.png)
+
 By clicking the ‘View Details’ button, you can also see additional information, including your keys and recent requests.
+
+![View details](public/view-details.png)
 
 ## 🎸 Start a React app and configure the Flow Javascript SDK
 
