@@ -13,8 +13,8 @@ on all your dapps.
 By the end of this guide you'll have a simple React app that is configured
 to send events to an Alchemy dashboard, that looks like this:
 
-[React App](public/flow-webapp)
-[Alchemy Dashboard](alchemy-dashboard)
+![React App](public/flow-webapp)
+![Alchemy Dashboard](public/alchemy-dashboard.png)
 
 ## 🪚 Pre-requesites 
 
