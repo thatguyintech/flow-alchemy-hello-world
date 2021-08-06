@@ -147,30 +147,29 @@ Inside `./src/scripts/check-profile.js`, copy this code:
 
 ```javascript
 // ./src/scripts/check-profile.js
+
 import * as fcl from "@onflow/fcl"
 import * as t from "@onflow/types"
 
-export const checkProfile = async() => {
-  console.log("checking")
-  await fcl
-    .send([
-      fcl.script`
-        import Profile from 0xba1132bc08f82fe2
+export const checkProfile = async () => {
+  const result = await fcl.query({
+    cadence: `
+      import Profile from 0xba1132bc08f82fe2
 
-        pub fun main(address: Address): Profile.ReadOnly? {
-          return Profile.read(address)
-        }
-      `,
-      fcl.args([
-        fcl.arg("0xba1132bc08f82fe2", t.Address), 
-      ]),
-    ])
-    .then(fcl.decode)
-    .then(d => console.log("Info recorded for address 0xba1132bc08f82fe2", d.info));
+      pub fun main(address: Address): Profile.ReadOnly? {
+        return Profile.read(address)
+      }
+    `,
+    args: (arg, t) => [
+      arg("0xba1132bc08f82fe2", t.Address)
+    ],
+  })
+  
+  console.log(result.info)
 }
 ```
 
-This function `checkProfile` uses the `fcl.send` function to execute a script to read the information
+This function `checkProfile` uses the `fcl.query` function to execute a script to read the information
 stored at a specific address: `0xba1132bc08f82fe2`, and then prints the `info` field recorded on the blockchain.
 We'll call this function from our app homepage by hooking it up to a button.
 
