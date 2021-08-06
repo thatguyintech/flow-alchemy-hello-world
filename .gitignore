@@ -5,3 +5,6 @@ node_modules
 .env.local
 .env
 .envrc
+
+# MAC things
+.DS_Store
